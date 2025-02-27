@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Study Planner</title>
+    <link rel="stylesheet" href="./hack.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-users"></i>
+                    StudyCollab
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Groups</a></li>
+                    <li><a href="#">Calendar</a></li>
+                    <li><a href="#">Resources</a></li>
+                </ul>
+                <div class="user-menu">
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create Group
+                    </a>
+                    <div class="user-avatar">JD</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> My Groups</a></li>
+                <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
+                <li><a href="#"><i class="fas fa-calendar"></i> Schedule</a></li>
+                <li><a href="#"><i class="fas fa-file-alt"></i> Resources</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Progress</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <h1 class="page-title">Dashboard</h1>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-title">Active Groups</div>
+                    <div class="stat-card-value">4</div>
+                    <div class="stat-card-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 2 new this week
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Pending Tasks</div>
+                    <div class="stat-card-value">7</div>
+                    <div class="stat-card-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> 3 less than last week
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Study Hours</div>
+                    <div class="stat-card-value">12.5</div>
+                    <div class="stat-card-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 2.5 more than last week
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Shared Resources</div>
+                    <div class="stat-card-value">23</div>
+                    <div class="stat-card-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 5 new this week
+                    </div>
+                </div>
+            </div>
+            <br>
+
+            <div class="content-grid">
+                <div class="content-main">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">My Study Groups</h2>
+                            <button class="btn btn-primary btn-sm" id="createGroupBtn">
+                                <i class="fas fa-plus"></i> Create New
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <ul class="group-list">
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-laptop-code"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Web Development Team</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-user"></i> 5 members</span>
+                                            <span><i class="fas fa-tasks"></i> 3 active tasks</span>
+                                            <span><i class="fas fa-calendar"></i> Next: Today, 3:00 PM</span>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                                </li>
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Advanced Statistics</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-user"></i> 4 members</span>
+                                            <span><i class="fas fa-tasks"></i> 2 active tasks</span>
+                                            <span><i class="fas fa-calendar"></i> Next: Tomorrow, 2:00 PM</span>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                                </li>
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-flask"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Chemistry Lab Prep</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-user"></i> 3 members</span>
+                                            <span><i class="fas fa-tasks"></i> 1 active task</span>
+                                            <span><i class="fas fa-calendar"></i> Next: Friday, 1:00 PM</span>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                                </li>
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Literature Review Group</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-user"></i> 6 members</span>
+                                            <span><i class="fas fa-tasks"></i> 4 active tasks</span>
+                                            <span><i class="fas fa-calendar"></i> Next: Saturday, 11:00 AM</span>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">My Tasks</h2>
+                            <a href="#" class="btn btn-primary btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <input type="checkbox" class="task-checkbox">
+                                    <div class="task-info">
+                                        <div class="task-title">Complete JavaScript practice exercises</div>
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-users"></i> Web Development Team</span>
+                                            <span><i class="fas fa-calendar"></i> Due: Today</span>
+                                            <span><i class="fas fa-flag"></i> High Priority</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" class="task-checkbox">
+                                    <div class="task-info">
+                                        <div class="task-title">Review statistical methods for midterm</div>
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-users"></i> Advanced Statistics</span>
+                                            <span><i class="fas fa-calendar"></i> Due: Tomorrow</span>
+                                            <span><i class="fas fa-flag"></i> Medium Priority</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 40%"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" class="task-checkbox">
+                                    <div class="task-info">
+                                        <div class="task-title">Prepare lab safety procedures document</div>
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-users"></i> Chemistry Lab Prep</span>
+                                            <span><i class="fas fa-calendar"></i> Due: Thursday</span>
+                                            <span><i class="fas fa-flag"></i> High Priority</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 20%"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <input type="checkbox" class="task-checkbox">
+                                    <div class="task-info">
+                                        <div class="task-title">Summarize Chapter 5 of the textbook</div>
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-users"></i> Literature Review Group</span>
+                                            <span><i class="fas fa-calendar"></i> Due: Friday</span>
+                                            <span><i class="fas fa-flag"></i> Medium Priority</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-side">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Today's Schedule</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="schedule-item">
+                                <div class="schedule-time">9:00 AM</div>
+                                <div class="schedule-details">
+                                    <div class="schedule-title">JavaScript Coding Session</div>
+                                    <div class="schedule-group">Web Development Team</div>
+                                </div>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time">11:30 AM</div>
+                                <div class="schedule-details">
+                                    <div class="schedule-title">Literature Analysis Discussion</div>
+                                    <div class="schedule-group">Literature Review Group</div>
+                                </div>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time">3:00 PM</div>
+                                <div class="schedule-details">
+                                    <div class="schedule-title">Project Planning Meeting</div>
+                                    <div class="schedule-group">Web Development Team</div>
+                                </div>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time">5:30 PM</div>
+                                <div class="schedule-details">
+                                    <div class="schedule-title">Statistics Problem Set Review</div>
+                                    <div class="schedule-group">Advanced Statistics</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Resources</h2>
+                            <a href="#" class="btn btn-primary btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <ul class="group-list">
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">JavaScript Fundamentals.pdf</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-users"></i> Web Development</span>
+                                            <span><i class="fas fa-clock"></i> Today</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-file-powerpoint"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Statistical Methods.pptx</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-users"></i> Statistics</span>
+                                            <span><i class="fas fa-clock"></i> Yesterday</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="group-item">
+                                    <div class="group-icon">
+                                        <i class="fas fa-file-word"></i>
+                                    </div>
+                                    <div class="group-info">
+                                        <div class="group-name">Chapter 5 Notes.docx</div>
+                                        <div class="group-meta">
+                                            <span><i class="fas fa-users"></i> Literature</span>
+                                            <span><i class="fas fa-clock"></i> 2 days ago</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div class="modal"
