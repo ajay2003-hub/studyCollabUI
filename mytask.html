@@ -1,0 +1,762 @@
+for task
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e6ef2;
+            --primary-hover: #3a5fe0;
+            --high-priority: #e74c3c;
+            --medium-priority: #f39c12;
+            --low-priority: #27ae60;
+            --text-dark: #2d3748;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+            --bg-color: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+
+
+
+
+        body {
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top navigation bar - fixed at top */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 100;
+    height: 56px; /* Fixed height for calculation */
+}
+
+/* Main container with sidebar - position below fixed navbar */
+.container-side {
+    display: flex;
+    margin-top: 57px; /* Height of navbar */
+    min-height: calc(100vh - 57px);
+    width: 100%;
+}
+
+/* Sidebar - fixed on left */
+.sidebar {
+    position: fixed;
+    top: 57px; /* Position below the navbar */
+    left: 0;
+    width: 250px;
+    background-color: white;
+    border-right: 1px solid #e0e0e0;
+    padding-top: 20px;
+    height: calc(100vh - 57px); /* Full remaining height */
+    overflow-y: auto; /* Allow scrolling if needed */
+}
+
+/* Container for main content - adjust to accommodate fixed sidebar */
+.container {
+    width: calc(100% - 250px); /* Full width minus sidebar */
+    margin-left: 250px; /* Push content right of sidebar */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Add task button - keep it fixed at bottom right */
+.add-task-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 90;
+}
+
+/* Ensure content fits properly on smaller screens */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .container {
+        width: calc(100% - 200px);
+        margin-left: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar {
+        width: 70px;
+    }
+    
+    .container {
+        width: calc(100% - 70px);
+        margin-left: 70px;
+    }
+    
+    .sidebar-item span.sidebar-icon {
+        margin-right: 0;
+    }
+    
+    .sidebar-item {
+        justify-content: center;
+        padding: 12px 0;
+    }
+}
+
+        /* body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+           
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+       
+        
+        /* Top navigation bar */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #5468ff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: #5468ff;
+            margin-right: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            margin-left: 80px;
+        }
+
+        .nav-links a {
+            margin-right: 24px;
+            text-decoration: none;
+            color: #555;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #5468ff;
+        }
+
+        .nav-links a.active {
+            color: #5468ff;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #5468ff;
+        }
+
+        .profile {
+            margin-left: auto;
+            font-weight: bold;
+            color: #5468ff;
+            background-color: #eef0ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .create-group {
+            margin-left: auto;
+            padding: 8px 16px;
+            background-color: #5468ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .create-group:hover {
+            background-color: #4456e8;
+        }
+
+        /* Main container with sidebar */
+        .container-side {
+            display: flex;
+            min-height: calc(100vh - 57px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 4px;
+        } */
+
+        .sidebar-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .sidebar-item.active {
+            background-color: #eef0ff;
+            color: #5468ff;
+            border-left: 4px solid #5468ff;
+            padding-left: 20px;
+        }
+
+        .sidebar-icon {
+            margin-right: 12px;
+            width: 20px;
+        }     
+        
+
+
+
+
+        .container {
+            width: 100%;
+            max-width:100%;
+            
+        }
+
+        .tasks-card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+          
+        }
+
+        .tasks-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tasks-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .tasks-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .view-all-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .view-all-btn:hover {
+            background-color: var(--primary-hover);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .tasks-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .task-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            transform: translateX(2px);
+        }
+
+        .task-checkbox {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .task-checkbox input {
+            opacity: 0;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 24px;
+            width: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .task-checkbox input:checked ~ .checkmark {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .task-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .task-content {
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            line-height: 1.4;
+            transition: var(--transition);
+        }
+
+        .task-checkbox input:checked ~ .task-content .task-title {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-medium);
+        }
+
+        .task-meta-item i {
+            margin-right: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .task-group {
+            background-color: rgba(78, 110, 242, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .task-due {
+            display: flex;
+            align-items: center;
+        }
+
+        .priority-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--high-priority);
+        }
+
+        .priority-medium {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--medium-priority);
+        }
+
+        .progress-container {
+            height: 6px;
+            background-color: #edf2f7;
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-high {
+            width: 85%;
+        }
+
+        .progress-medium {
+            width: 65%;
+        }
+
+        .progress-low {
+            width: 35%;
+        }
+
+        .chem-group {
+            background-color: rgba(142, 68, 173, 0.1);
+            color: #8e44ad;
+        }
+
+        .lit-group {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .stats-group {
+            background-color: rgba(41, 128, 185, 0.1);
+            color: #2980b9;
+        }
+
+        /* Add task button */
+        .add-task-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .add-task-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tasks-header {
+                padding: 1.25rem 1.5rem;
+            }
+            
+            .tasks-body {
+                padding: 1rem 1.5rem;
+            }
+            
+            .task-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .task-meta {
+                margin-top: 0.5rem;
+            }
+            
+            .tasks-title {
+                font-size: 1.25rem;
+            }
+            
+            .task-item {
+                padding: 1rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+        
+      <!-- Top Navigation Bar -->
+      <div class="top-nav">
+        <a href="#" class="logo">
+            <span class="logo-icon">👥</span>
+            StudyCollab
+        </a>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Groups</a>
+            <a href="#">Calendar</a>
+            <a href="#">Resources</a>
+        </div>
+        <button class="create-group">+ Create Group</button>
+        <div class="profile" style="margin-left: 16px;">JD</div>
+    </div>
+
+    <!-- Main Container with Sidebar -->
+    <div class="container-side">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="./index.html" class="sidebar-item">
+                <span class="sidebar-icon">🏠</span>
+                Dashboard
+            </a>
+            <a href="./index.html" class="sidebar-item">
+                <span class="sidebar-icon">👥</span>
+                My Groups
+            </a>
+            <a href="./mytask.html" class="sidebar-item">
+                <span class="sidebar-icon">📋</span>
+                Tasks
+            </a>
+            <a href="./schedule.html" class="sidebar-item">
+                <span class="sidebar-icon">📅</span>
+                Schedule
+            </a>
+            <a href="./resources.html" class="sidebar-item">
+                <span class="sidebar-icon">📚</span>
+                Resources
+            </a>
+            <a href="./progress.html" class="sidebar-item active">
+                <span class="sidebar-icon">📊</span>
+                Progress
+            </a>
+            <a href="#" class="sidebar-item">
+                <span class="sidebar-icon">⚙</span>
+                Settings
+            </a>
+        </div>
+
+
+    <div class="container">
+
+
+
+        <div class="tasks-card">
+            <div class="tasks-header">
+                <h1 class="tasks-title">My Tasks</h1>
+                <button class="view-all-btn">View All</button>
+            </div>
+            <div class="tasks-body">
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task1">
+                        <span class="checkmark"></span>
+                    </div>
+                    <div class="task-content">
+                        <h2 class="task-title">Complete JavaScript practice exercises</h2>
+                        <div class="task-meta">
+                            <span class="task-group">Web Development Team</span>
+                            <span class="task-meta-item task-due">
+                                <i class="far fa-calendar-alt"></i> Due: Today
+                            </span>
+                            <span class="priority-tag priority-high">
+                                <i class="fas fa-flag"></i> High Priority
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar progress-high"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task2">
+                        <span class="checkmark"></span>
+                    </div>
+                    <div class="task-content">
+                        <h2 class="task-title">Review statistical methods for midterm</h2>
+                        <div class="task-meta">
+                            <span class="task-group stats-group">Advanced Statistics</span>
+                            <span class="task-meta-item task-due">
+                                <i class="far fa-calendar-alt"></i> Due: Tomorrow
+                            </span>
+                            <span class="priority-tag priority-medium">
+                                <i class="fas fa-flag"></i> Medium Priority
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar progress-medium"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task3">
+                        <span class="checkmark"></span>
+                    </div>
+                    <div class="task-content">
+                        <h2 class="task-title">Prepare lab safety procedures document</h2>
+                        <div class="task-meta">
+                            <span class="task-group chem-group">Chemistry Lab Prep</span>
+                            <span class="task-meta-item task-due">
+                                <i class="far fa-calendar-alt"></i> Due: Thursday
+                            </span>
+                            <span class="priority-tag priority-high">
+                                <i class="fas fa-flag"></i> High Priority
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar progress-low"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task4">
+                        <span class="checkmark"></span>
+                    </div>
+                    <div class="task-content">
+                        <h2 class="task-title">Summarize Chapter 5 of the textbook</h2>
+                        <div class="task-meta">
+                            <span class="task-group lit-group">Literature Review Group</span>
+                            <span class="task-meta-item task-due">
+                                <i class="far fa-calendar-alt"></i> Due: Friday
+                            </span>
+                            <span class="priority-tag priority-medium">
+                                <i class="fas fa-flag"></i> Medium Priority
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar progress-medium"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-task-btn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        // Task checkbox functionality
+        const checkboxes = document.querySelectorAll('.task-checkbox input');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskItem = this.closest('.task-item');
+                if (this.checked) {
+                    taskItem.style.opacity = '0.6';
+                } else {
+                    taskItem.style.opacity = '1';
+                }
+            });
+        });
+
+        // Add task button animation
+        const addTaskBtn = document.querySelector('.add-task-btn');
+        
+        addTaskBtn.addEventListener('mousedown', function() {
+            this.style.transform = 'scale(0.95)';
+        });
+        
+        addTaskBtn.addEventListener('mouseup', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        // View all button click effect
+        const viewAllBtn = document.querySelector('.view-all-btn');
+        
+        viewAllBtn.addEventListener('click', function() {
+            alert('Viewing all tasks');
+        });
+    </script>
+</body>
+</html>

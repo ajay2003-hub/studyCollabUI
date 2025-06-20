@@ -18,15 +18,18 @@
                 </div>
                 <ul class="nav-links">
                     <li><a href="#" class="active">Dashboard</a></li>
-                    <li><a href="#">Groups</a></li>
-                    <li><a href="#">Calendar</a></li>
-                    <li><a href="#">Resources</a></li>
+                    <li><a href="./messanger.html">Live Chat</a></li>
+                    <!-- <li><a href="#">Calendar</a></li> -->
+                    <li><a href="./resources.html">Resources</a></li>
                 </ul>
                 <div class="user-menu">
                     <a href="#" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-plus"></i> Create Group
                     </a>
-                    <div class="user-avatar">JD</div>
+                    <div class="user-avatar" >
+                        <a href="./profile.html">JD</a>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
                 </div>
             </nav>
         </div>
@@ -35,13 +38,13 @@
     <div class="dashboard">
         <aside class="sidebar">
             <ul class="sidebar-menu">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#"><i class="fas fa-users"></i> My Groups</a></li>
-                <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
-                <li><a href="#"><i class="fas fa-calendar"></i> Schedule</a></li>
-                <li><a href="#"><i class="fas fa-file-alt"></i> Resources</a></li>
-                <li><a href="#"><i class="fas fa-chart-line"></i> Progress</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="./index.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> My Group</a></li>
+                <li><a href="./mytask.html"><i class="fas fa-tasks"></i> Tasks</a></li>
+                <li><a href="./schedule.html"><i class="fas fa-calendar"></i> Schedule</a></li>
+                <li><a href="./resources.html"><i class="fas fa-file-alt"></i> Resources</a></li>
+                <li><a href="./progress.html"><i class="fas fa-chart-line"></i> Progress</a></li>
+                <li><a href="./setting.html"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
         </aside>
 
@@ -308,4 +311,15 @@
     </div>
 
     <!-- Create Group Modal -->
-    <div class="modal"
+    <div class="modal">
+        <script>
+            function logout() {
+    // Optionally, clear user data from localStorage or sessionStorage if necessary
+    localStorage.removeItem("userLoggedIn");
+    sessionStorage.removeItem("userLoggedIn");
+
+    // Redirect to the index.html page
+    window.location.href = 'authontication.html'; // Redirecting to the index.html page
+}
+
+        </script>

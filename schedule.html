@@ -1,0 +1,715 @@
+for schedule 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Schedule</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4361ee15;
+            --primary-dark: #3a56d4;
+            --secondary: #2d3748;
+            --text-dark: #1a202c;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+            --accent-blue: #3182ce;
+            --accent-purple: #805ad5;
+            --accent-green: #38a169;
+            --accent-orange: #dd6b20;
+            --white: #ffffff;
+            --off-white: #f7fafc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            line-height: 1.5;
+
+            /* Remove flex display to avoid centering issues */
+            display: block;
+            padding: 0;
+            margin: 0;
+        }
+
+        
+/* Top navigation bar */
+.top-nav {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #5468ff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            color: #5468ff;
+            margin-right: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            margin-left: 80px;
+        }
+
+        .nav-links a {
+            margin-right: 24px;
+            text-decoration: none;
+            color: #555;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #5468ff;
+        }
+
+        .nav-links a.active {
+            color: #5468ff;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #5468ff;
+        }
+
+        .profile {
+            margin-left: auto;
+            font-weight: bold;
+            color: #5468ff;
+            background-color: #eef0ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .create-group {
+            margin-left: auto;
+            padding: 8px 16px;
+            background-color: #5468ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .create-group:hover {
+            background-color: #4456e8;
+        }
+
+        /* Main container with sidebar */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 57px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .sidebar-item.active {
+            background-color: #eef0ff;
+            color: #5468ff;
+            border-left: 4px solid #5468ff;
+            padding-left: 20px;
+        }
+
+        .sidebar-icon {
+            margin-right: 12px;
+            width: 20px;
+        }
+
+
+
+
+
+        /* Main wrapper with fixed dimensions */
+        .page-wrapper {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .schedule-section {
+            /* Fixed position in the page */
+            width: 100%;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .schedule-container {
+            width: 80%;
+            height: 80vh; /* Fixed height */
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .schedule-header {
+            padding: 1.5rem 2rem 1.25rem;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .schedule-title {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .schedule-title i {
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+
+        .schedule-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--white);
+            color: var(--text-medium);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .date-button:hover {
+            background-color: var(--off-white);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        .date-button i {
+            font-size: 0.875rem;
+        }
+
+        .current-date {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .schedule-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        .schedule-body {
+            padding: 1.5rem 1.25rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .schedule-items-container {
+            height: 100%;
+        }
+
+        .schedule-item {
+            position: relative;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+            background-color: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.25rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .schedule-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .schedule-item:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+            transform: translateX(2px);
+        }
+
+        .time-slot {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            padding-right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .event-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.375rem;
+        }
+
+        .event-location {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .event-location i {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .web-development {
+            background-color: var(--accent-blue);
+        }
+
+        .literature-review {
+            background-color: var(--accent-purple);
+        }
+
+        .project-planning {
+            background-color: var(--accent-green);
+        }
+
+        .statistics {
+            background-color: var(--accent-orange);
+        }
+
+        .schedule-footer {
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .add-event-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 1px 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .add-event-btn:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .add-event-btn i {
+            font-size: 0.875rem;
+        }
+
+        /* Current event indicator */
+        .current::before {
+            content: "NOW";
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #fc8181;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .schedule-item {
+            animation: fadeIn 0.5s ease-out backwards;
+        }
+
+        .schedule-item:nth-child(1) { animation-delay: 0.1s; }
+        .schedule-item:nth-child(2) { animation-delay: 0.2s; }
+        .schedule-item:nth-child(3) { animation-delay: 0.3s; }
+        .schedule-item:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Responsive adjustments while keeping fixed dimensions */
+        @media (max-width: 540px) {
+            .schedule-container {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            .schedule-section {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+          <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <a href="#" class="logo">
+            <span class="logo-icon">👥</span>
+            StudyCollab
+        </a>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Groups</a>
+            <a href="#">Calendar</a>
+            <a href="#">Resources</a>
+        </div>
+        <button class="create-group">+ Create Group</button>
+        <div class="profile" style="margin-left: 16px;">JD</div>
+    </div>
+
+    <!-- Main Container with Sidebar -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="./index.html" class="sidebar-item">
+                <span class="sidebar-icon">🏠</span>
+                Dashboard
+            </a>
+            <a href="./index.html" class="sidebar-item">
+                <span class="sidebar-icon">👥</span>
+                My Groups
+            </a>
+            <a href="./mytask.html" class="sidebar-item">
+                <span class="sidebar-icon">📋</span>
+                Tasks
+            </a>
+            <a href="./schedule.html" class="sidebar-item">
+                <span class="sidebar-icon">📅</span>
+                Schedule
+            </a>
+            <a href="./resources.html" class="sidebar-item">
+                <span class="sidebar-icon">📚</span>
+                Resources
+            </a>
+            <a href="./progress.html" class="sidebar-item active">
+                <span class="sidebar-icon">📊</span>
+                Progress
+            </a>
+            <a href="./setting.html" class="sidebar-item">
+                <span class="sidebar-icon">⚙</span>
+                Settings
+            </a>
+        </div>
+
+
+
+
+
+    <div class="page-wrapper">
+        <div class="schedule-section">
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h1 class="schedule-title">
+                        <i class="far fa-calendar-alt"></i>
+                        Today's Schedule
+                    </h1>
+                    <div class="date-selector">
+                        <button class="date-button" id="prevDay">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="current-date" id="currentDate">Feb 27, 2025</span>
+                        <button class="date-button" id="nextDay">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="schedule-divider"></div>
+                <div class="schedule-body">
+                    <div class="schedule-items-container" id="scheduleItems">
+                        <!-- Schedule items will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div class="schedule-footer">
+                    <button class="add-event-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Event
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial schedule data
+            const scheduleData = [
+                {
+                    time: '9:00 AM',
+                    title: 'JavaScript Coding Session',
+                    location: 'Web Development Team',
+                    type: 'web-development'
+                },
+                {
+                    time: '11:30 AM',
+                    title: 'Literature Analysis Discussion',
+                    location: 'Literature Review Group',
+                    type: 'literature-review'
+                },
+                {
+                    time: '3:00 PM',
+                    title: 'Project Planning Meeting',
+                    location: 'Web Development Team',
+                    type: 'project-planning',
+                    current: true
+                },
+                {
+                    time: '5:30 PM',
+                    title: 'Statistics Problem Set Review',
+                    location: 'Advanced Statistics',
+                    type: 'statistics'
+                }
+            ];
+
+            // Get current date
+            const currentDate = new Date();
+            const formattedDate = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('currentDate').textContent = formattedDate;
+            
+            // Render schedule items
+            renderScheduleItems(scheduleData);
+            
+            // Date navigation
+            let currentDay = 0;
+            
+            document.getElementById('prevDay').addEventListener('click', function() {
+                currentDay--;
+                updateDate();
+                updateSchedule();
+            });
+            
+            document.getElementById('nextDay').addEventListener('click', function() {
+                currentDay++;
+                updateDate();
+                updateSchedule();
+            });
+            
+            // Add event button animation
+            const addEventBtn = document.querySelector('.add-event-btn');
+            addEventBtn.addEventListener('click', function() {
+                alert('Add new event form would open here');
+            });
+            
+            // Update displayed date
+            function updateDate() {
+                const newDate = new Date();
+                newDate.setDate(currentDate.getDate() + currentDay);
+                
+                const formattedNewDate = newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                document.getElementById('currentDate').textContent = formattedNewDate;
+            }
+            
+            // Update schedule based on date
+            function updateSchedule() {
+                // Here you would typically fetch new data based on the date
+                // For demo purposes, we'll just modify the existing data
+                
+                if (currentDay !== 0) {
+                    // Generate pseudo-random schedule for other days
+                    const modifiedData = scheduleData.map(item => {
+                        return {
+                            ...item,
+                            current: false,
+                            // Shift times by 30 mins for variety
+                            time: shiftTime(item.time, currentDay * 30)
+                        };
+                    });
+                    
+                    renderScheduleItems(modifiedData);
+                } else {
+                    // Reset to original schedule for today
+                    renderScheduleItems(scheduleData);
+                }
+            }
+            
+            // Render schedule items to DOM
+            function renderScheduleItems(items) {
+                const container = document.getElementById('scheduleItems');
+                container.innerHTML = '';
+                
+                items.forEach(item => {
+                    const scheduleItem = document.createElement('div');
+                    scheduleItem.className = `schedule-item ${item.current ? 'current' : ''}`;
+                    
+                    scheduleItem.innerHTML = `
+                        <div class="indicator ${item.type}"></div>
+                        <div class="time-slot">${item.time}</div>
+                        <div class="event-details">
+                            <div class="event-title">${item.title}</div>
+                            <div class="event-location">
+                                <i class="fas fa-users"></i>
+                                ${item.location}
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(scheduleItem);
+                });
+            }
+            
+            // Utility function to shift time by minutes
+            function shiftTime(timeStr, minutesToAdd) {
+                const [time, period] = timeStr.split(' ');
+                let [hours, minutes] = time.split(':').map(Number);
+                
+                // Convert to 24 hour format
+                if (period === 'PM' && hours < 12) hours += 12;
+                if (period === 'AM' && hours === 12) hours = 0;
+                
+                // Add minutes
+                let totalMinutes = hours * 60 + minutes + minutesToAdd;
+                
+                // Handle overflow
+                while (totalMinutes < 0) totalMinutes += 24 * 60;
+                totalMinutes = totalMinutes % (24 * 60);
+                
+                // Convert back to hours and minutes
+                let newHours = Math.floor(totalMinutes / 60);
+                let newMinutes = totalMinutes % 60;
+                
+                // Convert back to 12 hour format
+                let newPeriod = 'AM';
+                if (newHours >= 12) {
+                    newPeriod = 'PM';
+                    if (newHours > 12) newHours -= 12;
+                }
+                if (newHours === 0) newHours = 12;
+                
+                // Format time string
+                        return `${newHours}:${newMinutes.toString().padStart(2, '0')} ${newPeriod}`;
+                    }
+                    
+                    // Add hover effect to schedule items
+                    document.addEventListener('click', function(e) {
+                        const scheduleItem = e.target.closest('.schedule-item');
+                        if (scheduleItem) {
+                            const title = scheduleItem.querySelector('.event-title').textContent;
+                            alert(`View details for: ${title}`);
+                        }
+                    });
+                });
+            </script>
+        </body>
+        </html>
+    </script>
+</body>
+</html>
