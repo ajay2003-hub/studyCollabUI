@@ -18,7 +18,7 @@
                 </div>
                 <ul class="nav-links">
                     <li><a href="#" class="active">Dashboard</a></li>
-                    <li><a href="./messanger.html">Live Chat</a></li>
+                    <!-- Live Chat moved to right-side tab/icon -->
                     <!-- <li><a href="#">Calendar</a></li> -->
                     <li><a href="./resources.html">Resources</a></li>
                 </ul>
@@ -311,15 +311,392 @@
     </div>
 
     <!-- Create Group Modal -->
-    <div class="modal">
-        <script>
-            function logout() {
-    // Optionally, clear user data from localStorage or sessionStorage if necessary
-    localStorage.removeItem("userLoggedIn");
-    sessionStorage.removeItem("userLoggedIn");
+    <div class="modal" id="createGroupModal"></div>
 
-    // Redirect to the index.html page
-    window.location.href = 'authontication.html'; // Redirecting to the index.html page
-}
+    <!-- Chat tab (home) - opens in-page panel -->
+    <button class="chat-tab" id="openChatBtn" title="Open Chat" aria-expanded="false">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+    </button>
 
-        </script>
+    <!-- Chat panel (hidden by default) -->
+    <div class="chat-panel hidden" id="chatPanel" aria-hidden="true">
+        <div class="chat-left">
+            <div class="chat-header">
+                <strong>Chats</strong>
+                <button id="chatFullBtn" title="Toggle fullscreen" aria-label="Toggle fullscreen"><i class="fas fa-expand"></i></button>
+            </div>
+
+            <div class="chat-tabs" role="tablist" aria-label="Chat tabs">
+                <button class="active" data-tab="chats" role="tab" aria-selected="true">Chats</button>
+                <button data-tab="groups" role="tab">Groups</button>
+                <button data-tab="qa" role="tab">Q&amp;A</button>
+                <button data-tab="analytics" role="tab">Analytics</button>
+            </div>
+
+            <div class="chat-search">
+                <input type="search" id="chatSearch" placeholder="Search groups, peers or questions" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--gray-200)">
+            </div>
+
+            <div class="chat-list" id="leftList">
+                <!-- active tab list (chats/groups/qa) rendered here -->
+            </div>
+        </div>
+        <div class="chat-right">
+            <div class="chat-header" id="conversationHeader">
+                <div class="meta-left">
+                    <strong id="convTitle">Select a chat</strong>
+                </div>
+                <div class="meta-actions">
+                    <button id="closePanelBtn" title="Close chat"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="conversation" id="conversationArea">
+                <div class="messages" id="messages"></div>
+                <div class="chat-input">
+                    <input id="messageInput" placeholder="Type a message..." aria-label="Message input">
+                    <button id="sendBtn" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thread view (hidden unless opened) -->
+        <div class="thread-view" id="threadView" style="display:none">
+            <div class="thread-header">
+                <div><strong id="threadTitle">Thread</strong></div>
+                <div><button id="closeThreadBtn" title="Close thread"><i class="fas fa-times"></i></button></div>
+            </div>
+            <div class="thread-body" id="threadBody"></div>
+            <div class="thread-reply">
+                <label class="anonymous-toggle"><input type="checkbox" id="threadAnon"> Post anonymously</label>
+                <input id="threadReplyInput" placeholder="Write an answer...">
+                <button id="threadReplyBtn" class="btn btn-primary">Reply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            // Optionally, clear user data from localStorage or sessionStorage if necessary
+            localStorage.removeItem("userLoggedIn");
+            sessionStorage.removeItem("userLoggedIn");
+
+            // Redirect to the authentication page
+            window.location.href = 'authontication.html';
+        }
+    </script>
+
+    <script>
+        // Chat panel behaviour and demo data
+        (function(){
+            const openBtn = document.getElementById('openChatBtn');
+            const panel = document.getElementById('chatPanel');
+            const closeBtn = document.getElementById('closePanelBtn');
+            const fullBtn = document.getElementById('chatFullBtn');
+            const leftList = document.getElementById('leftList');
+            const tabButtons = Array.from(document.querySelectorAll('.chat-tabs button'));
+            const messagesEl = document.getElementById('messages');
+            const convTitle = document.getElementById('convTitle');
+            const sendBtn = document.getElementById('sendBtn');
+            const messageInput = document.getElementById('messageInput');
+            const threadView = document.getElementById('threadView');
+            const threadBody = document.getElementById('threadBody');
+            const closeThreadBtn = document.getElementById('closeThreadBtn');
+            const threadTitle = document.getElementById('threadTitle');
+            const threadReplyInput = document.getElementById('threadReplyInput');
+            const threadReplyBtn = document.getElementById('threadReplyBtn');
+
+            // Demo data (replace with real data later)
+            const groups = [
+                { id: 'g1', name: 'Web Development Team', last: 'Share project resources' },
+                { id: 'g2', name: 'Advanced Statistics', last: 'Problem set discussion' },
+                { id: 'g3', name: 'Chemistry Lab Prep', last: 'Lab safety notes' }
+            ];
+
+            const peers = [
+                { id: 'p1', name: 'Alice', last: 'Sent an invite' },
+                { id: 'p2', name: 'Bob', last: 'Accepted your invite' }
+            ];
+
+            // simple message store keyed by convo id
+            // messages with tags: Question / Answer / Resource / Discussion
+            const messages = {
+                g1: [ {id:'m1', from:'them', text:'Welcome to the Web Dev group!', tag:'Discussion'}, {id:'m2', from:'me', text:'Thanks!', tag:'Discussion'} , {id:'q1', from:'them', text:'Who can answer question on CSS grid?', tag:'Question'} ],
+                g2: [ {id:'m1', from:'them', text:'Exam tips posted.', tag:'Resource'} ],
+                p1: [ {id:'m1', from:'them', text:'Hey — want to pair for study session?', tag:'Discussion'} ],
+                p2: [ {id:'m1', from:'me', text:'Hi Bob, welcome!', tag:'Discussion'} ]
+            };
+
+            // threadReplies stores replies/comments for question messages
+            const threadReplies = {
+                q1: [ { id: 't1', from: 'Alice', text: 'I can explain CSS grid in the meeting.', reactions: { like: 2 } } ]
+            };
+
+            let activeConvo = null;
+
+            function renderChats(){
+                leftList.innerHTML = '';
+                // combine groups and peers into a single chats list with last message preview/time
+                const combined = [];
+                groups.forEach(g=> combined.push({ id:g.id, name:g.name, last: g.last, type:'group' }));
+                peers.forEach(p=> combined.push({ id:p.id, name:p.name, last: p.last, type:'peer' }));
+                combined.forEach(item=>{
+                    const el = document.createElement('div');
+                    el.className = 'chat-item';
+                    el.dataset.id = item.id;
+                    el.innerHTML = `<div class="avatar">${item.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</div><div class="meta"><div class="name">${item.name}</div><div class="sub">${item.last}</div></div>`;
+                    el.addEventListener('click', ()=> openConversation(item.id, item.name));
+                    leftList.appendChild(el);
+                });
+            }
+
+            function renderGroups(){
+                leftList.innerHTML = '';
+                groups.forEach(g=>{
+                    const el = document.createElement('div');
+                    el.className = 'chat-item';
+                    el.dataset.id = g.id;
+                    el.innerHTML = `<div class="avatar">${g.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</div><div class="meta"><div class="name">${g.name}</div><div class="sub">${g.last}</div></div>`;
+                    el.addEventListener('click', ()=> openConversation(g.id, g.name));
+                    leftList.appendChild(el);
+                });
+            }
+
+            function renderQAs(){
+                leftList.innerHTML = '';
+                // collect questions across conversations
+                const qlist = [];
+                Object.keys(messages).forEach(conv=>{
+                    (messages[conv]||[]).forEach(m=>{ if(m.type === 'question') qlist.push({ convo: conv, id: m.id, text: m.text, title: (conv && (groups.find(g=>g.id===conv)||peers.find(p=>p.id===conv))?.name) || 'Conversation' }); });
+                });
+                if(qlist.length===0){ leftList.innerHTML = '<div style="padding:12px;color:var(--gray-600)">No questions yet</div>'; return; }
+                qlist.forEach(q=>{
+                    const el = document.createElement('div');
+                    el.className = 'chat-item';
+                    el.dataset.id = q.id;
+                    el.innerHTML = `<div class="avatar">Q</div><div class="meta"><div class="name">${q.title}</div><div class="sub">${q.text}</div></div>`;
+                    el.addEventListener('click', ()=> openThread(q.convo, q.id, q.text));
+                    leftList.appendChild(el);
+                });
+            }
+
+            function renderAnalytics(){
+                leftList.innerHTML = '';
+                // simple analytics from demo data
+                const questions = Object.keys(messages).reduce((acc, conv)=> acc + (messages[conv].filter(m=>m.type==='question').length), 0);
+                const answers = Object.keys(messages).reduce((acc, conv)=> acc + (messages[conv].filter(m=>m.from==='me').length), 0);
+                const timeSpent = '12h 30m'; // placeholder - replace with real tracking
+                const avgResponse = '15m';
+                const wrap = document.createElement('div');
+                wrap.style.padding='12px';
+                wrap.innerHTML = `<div style="margin-bottom:10px"><strong>Time spent</strong><div style="color:var(--gray-600)">${timeSpent}</div></div><div style="margin-bottom:10px"><strong>Questions asked</strong><div style="color:var(--gray-600)">${questions}</div></div><div style="margin-bottom:10px"><strong>Answers given</strong><div style="color:var(--gray-600)">${answers}</div></div><div style="margin-bottom:10px"><strong>Avg response time</strong><div style="color:var(--gray-600)">${avgResponse}</div></div>`;
+                leftList.appendChild(wrap);
+            }
+
+            function openConversation(id, title){
+                activeConvo = id;
+                convTitle.textContent = title;
+                messagesEl.innerHTML = '';
+                const convo = messages[id] || [];
+                convo.forEach(m => {
+                    const me = m.from === 'me';
+                    const div = document.createElement('div');
+                    div.className = 'msg ' + (me ? 'me' : 'them');
+                    div.dataset.id = m.id;
+                    // show tag chip
+                    const textNode = document.createElement('div');
+                    textNode.innerText = m.text;
+                    div.appendChild(textNode);
+                    if(m.tag){ const chip = document.createElement('span'); chip.className='tag-chip'; chip.innerText = m.tag; div.appendChild(chip); }
+                    // If this message is a Question, show Answer button which opens thread
+                    if(m.tag === 'Question'){
+                        const btn = document.createElement('button');
+                        btn.className = 'btn';
+                        btn.style.marginTop = '8px';
+                        btn.innerText = 'Answer';
+                        btn.addEventListener('click', ()=> openThread(id, m.id, m.text));
+                        div.appendChild(document.createElement('br'));
+                        div.appendChild(btn);
+                    }
+                    messagesEl.appendChild(div);
+                });
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                // open panel if hidden
+                panel.classList.remove('hidden');
+                panel.setAttribute('aria-hidden','false');
+                openBtn.setAttribute('aria-expanded','true');
+            }
+
+            function sendMessage(){
+                const text = messageInput.value.trim();
+                if(!text || !activeConvo) return;
+                const id = 'm' + Date.now();
+                const msg = { id, from:'me', text };
+                messages[activeConvo] = messages[activeConvo] || [];
+                messages[activeConvo].push(msg);
+                messageInput.value = '';
+                openConversation(activeConvo, convTitle.textContent);
+            }
+
+            // Thread controls
+            let threadTimer = null;
+            let threadEndsAt = null;
+            let aiAutoRefreshInterval = null;
+            let currentThreadMessageId = null;
+            const DEFAULT_TIMEBOX_MINUTES = 45; // default timebox
+
+            function renderThreadMessages(messageId){
+                threadBody.innerHTML = '';
+                const replies = threadReplies[messageId] || [];
+                replies.forEach(r=>{
+                    const d = document.createElement('div');
+                    d.className = 'msg them';
+                    d.style.background = '#f7f9fc';
+                    d.style.padding = '8px';
+                    d.style.borderRadius = '8px';
+                    d.style.maxWidth = '100%';
+                    d.dataset.rid = r.id;
+                    d.innerHTML = `<div><strong>${r.from}</strong></div><div>${r.text}</div>`;
+                    // reactions
+                    const rc = document.createElement('div'); rc.className='reaction-chips';
+                    const like = document.createElement('div'); like.className='reaction-chip'; like.innerHTML = `👍 <span class="count">${(r.reactions && r.reactions.like)||0}</span>`; like.addEventListener('click', ()=> toggleReaction(messageId, r.id, 'like', like));
+                    const heart = document.createElement('div'); heart.className='reaction-chip'; heart.innerHTML = `❤️ <span class="count">${(r.reactions && r.reactions.heart)||0}</span>`; heart.addEventListener('click', ()=> toggleReaction(messageId, r.id, 'heart', heart));
+                    rc.appendChild(like); rc.appendChild(heart); d.appendChild(rc);
+                    threadBody.appendChild(d);
+                });
+                threadBody.scrollTop = threadBody.scrollHeight;
+            }
+
+            function toggleReaction(threadMessageId, replyId, reactionKey, chipEl){
+                const replies = threadReplies[threadMessageId] || [];
+                const r = replies.find(x=>x.id===replyId);
+                if(!r) return;
+                r.reactions = r.reactions || {};
+                r.reactions[reactionKey] = (r.reactions[reactionKey]||0) + 1;
+                chipEl.querySelector('.count').innerText = r.reactions[reactionKey];
+                chipEl.classList.add('active');
+            }
+
+            function generateAISummary(questionText){
+                // mock AI output
+                const points = [
+                    'Key idea: Use grid-template-columns for layout.',
+                    'Tip: Combine grid with auto-fit for responsive columns.',
+                    'Example: .container { display:grid; grid-template-columns: repeat(3, 1fr); }'
+                ];
+                const pick = points.slice(0, Math.min(3, Math.floor(Math.random()*3)+1)).join('\n');
+                return `AI Summary:\n${pick}`;
+            }
+
+            function startAIAutoRefresh(questionText, summaryEl, seconds=10){
+                if(aiAutoRefreshInterval) clearInterval(aiAutoRefreshInterval);
+                aiAutoRefreshInterval = setInterval(()=>{ summaryEl.querySelector('.summary-text').innerText = generateAISummary(questionText); }, seconds*1000);
+            }
+
+            function stopAIAutoRefresh(){ if(aiAutoRefreshInterval) clearInterval(aiAutoRefreshInterval); aiAutoRefreshInterval=null; }
+
+            function startCountdown(minutes, onTick, onEnd){
+                stopCountdown();
+                threadEndsAt = Date.now() + minutes*60*1000;
+                threadTimer = setInterval(()=>{
+                    const rem = threadEndsAt - Date.now();
+                    if(rem <= 0){ stopCountdown(); onEnd && onEnd(); }
+                    else { const mins = Math.floor(rem/60000); const secs = Math.floor((rem%60000)/1000); onTick && onTick(`${mins}m ${secs}s`); }
+                }, 1000);
+            }
+
+            function stopCountdown(){ if(threadTimer) clearInterval(threadTimer); threadTimer = null; threadEndsAt = null; }
+
+            function openThread(convoId, messageId, questionText){
+                currentThreadMessageId = messageId;
+                // populate header
+                threadTitle.textContent = questionText;
+                // remove any previous summary
+                const prevSummary = threadView.querySelector('.ai-summary'); if(prevSummary) prevSummary.remove();
+                // build AI summary box
+                const summaryHtml = `
+                    <div class="ai-summary">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <strong>AI Summary</strong>
+                            <div class="controls"><button id="aiRefreshBtn" class="btn btn-sm">Refresh</button><label style="margin-left:8px;font-size:13px"><input type="checkbox" id="aiAuto" style="margin-right:6px">Auto</label></div>
+                        </div>
+                        <pre class="summary-text" style="white-space:pre-wrap;margin-top:8px;font-size:13px;color:var(--gray-800)">${generateAISummary(questionText)}</pre>
+                    </div>
+                `;
+                // inject into threadView above threadBody
+                threadBody.insertAdjacentHTML('beforebegin', summaryHtml);
+                // attach events
+                const aiRefreshBtn = threadView.querySelector('#aiRefreshBtn');
+                const aiAuto = threadView.querySelector('#aiAuto');
+                aiRefreshBtn.addEventListener('click', ()=>{ const s = generateAISummary(questionText); const el = threadView.querySelector('.summary-text'); if(el) el.innerText = s; });
+                aiAuto.addEventListener('change', function(){ if(this.checked) startAIAutoRefresh(questionText, threadView.querySelector('.ai-summary')); else stopAIAutoRefresh(); });
+
+                // render existing thread messages
+                renderThreadMessages(messageId);
+
+                // show thread view
+                threadView.style.display = 'flex';
+                document.getElementById('threadReplyInput').disabled = false; document.getElementById('threadReplyBtn').disabled = false;
+
+                // start countdown timebox
+                const existingCountdown = threadView.querySelector('.countdown'); if(existingCountdown) existingCountdown.remove();
+                const countdownDisplay = document.createElement('div'); countdownDisplay.className='countdown'; countdownDisplay.style.marginLeft='12px';
+                const header = threadView.querySelector('.thread-header'); header.appendChild(countdownDisplay);
+                startCountdown(DEFAULT_TIMEBOX_MINUTES, (timeStr)=>{ countdownDisplay.innerText = `${timeStr} left`; }, ()=>{ countdownDisplay.innerText = 'Closed'; // close thread
+                    const closed = document.createElement('div'); closed.className='thread-closed'; closed.innerText='This thread has been closed.'; threadView.appendChild(closed); document.getElementById('threadReplyInput').disabled = true; document.getElementById('threadReplyBtn').disabled = true; stopAIAutoRefresh(); });
+            }
+
+            // tab switching
+            tabButtons.forEach(btn=> btn.addEventListener('click', function(){
+                tabButtons.forEach(b=> b.classList.remove('active')); btn.classList.add('active');
+                const tab = btn.dataset.tab;
+                if(tab==='chats') renderChats();
+                else if(tab==='groups') renderGroups();
+                else if(tab==='qa') renderQAs();
+                else if(tab==='analytics') renderAnalytics();
+            }));
+
+            function closeThread(){
+                threadView.style.display='none';
+                // remove AI summary if present
+                const summary = threadView.querySelector('.ai-summary'); if(summary) summary.remove();
+                stopAIAutoRefresh();
+                stopCountdown();
+                currentThreadMessageId = null;
+            }
+
+            function toggleFullscreen(){
+                panel.classList.toggle('chat-fullscreen');
+                const icon = fullBtn.querySelector('i');
+                if(panel.classList.contains('chat-fullscreen')){ icon.className='fas fa-compress'; }
+                else { icon.className='fas fa-expand'; }
+            }
+
+            // events
+            openBtn.addEventListener('click', ()=>{ panel.classList.remove('hidden'); panel.setAttribute('aria-hidden','false'); openBtn.setAttribute('aria-expanded','true'); });
+            closeBtn.addEventListener('click', ()=>{ panel.classList.add('hidden'); panel.setAttribute('aria-hidden','true'); openBtn.setAttribute('aria-expanded','false'); });
+            fullBtn.addEventListener('click', toggleFullscreen);
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(); });
+            closeThreadBtn.addEventListener('click', ()=>{ closeThread(); });
+            threadReplyBtn.addEventListener('click', function(){
+                const v = threadReplyInput.value.trim(); if(!v || !currentThreadMessageId) return;
+                const anon = document.getElementById('threadAnon').checked;
+                const from = anon ? 'Anonymous' : 'You';
+                const rid = 'r' + Date.now();
+                threadReplies[currentThreadMessageId] = threadReplies[currentThreadMessageId] || [];
+                threadReplies[currentThreadMessageId].push({ id: rid, from, text: v, reactions: {} });
+                threadReplyInput.value='';
+                renderThreadMessages(currentThreadMessageId);
+            });
+
+            // Initialize with Chats tab
+            renderChats();
+
+            // Accessibility: close panel with Escape
+            document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ if(threadView.style.display==='flex') closeThread(); else { panel.classList.add('hidden'); panel.setAttribute('aria-hidden','true'); openBtn.setAttribute('aria-expanded','false'); } } });
+        })();
+    </script>
+
+    </body>
+    </html>
